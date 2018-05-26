@@ -28,10 +28,29 @@ class WaterMarkCamera : FrameLayout {
     private val photos: RecyclerView by lazy {
         photoRecycler.apply {
             layoutManager = GridLayoutManager(context, 3)
-            adapter = WaterMarkAdapter(R.layout.marker_image_item)
-
+            adapter = waterMarkAdapter
         }
     }
+
+    val waterMarkAdapter: WaterMarkAdapter by lazy {
+        WaterMarkAdapter(R.layout.marker_image_item).apply {
+            addData(0, ImageSource.LocalImageSource(R.drawable.ic_launcher_foreground))
+            setOnItemChildClickListener { adapter, view, position ->
+                when (adapter.data[position]) {
+                    is ImageSource.LocalImageSource -> {
+
+                    }
+                    is ImageSource.CapturedImageSource -> {
+
+                    }
+                }
+            }
+            setOnItemChildClickListener { adapter, view, position ->
+
+            }
+        }
+    }
+
 
     constructor(context: Context) : super(context) {
         this.addView(customView)
@@ -50,10 +69,28 @@ class WaterMarkCamera : FrameLayout {
                 }
                 is ImageSource.LocalImageSource -> {
                     helper.setImageResource(R.id.img, item.id)
+                    helper.setImageResource(R.id.close, R.drawable.close)
                 }
             }
+            helper.addOnClickListener(R.id.img)
+            helper.addOnClickListener(R.id.close)
         }
     }
+
+    private fun getDataSize() = waterMarkAdapter.data.size
+
+    fun addCapturedImage(imageSource: ImageSource.CapturedImageSource) {
+        waterMarkAdapter.remove(getDataSize() - 1)
+        waterMarkAdapter.addData(imageSource)
+    }
+
+    fun removeImage(index: Int) {
+        waterMarkAdapter.remove(index)
+        if (getDataSize() == 0) {
+            waterMarkAdapter.addData(ImageSource.LocalImageSource(R.drawable.ic_launcher_foreground))
+        }
+    }
+
 
     sealed class ImageSource(imageType: ImageType) {
         data class CapturedImageSource(val bitmap: Bitmap) : ImageSource(ImageType.CAPTURE)
