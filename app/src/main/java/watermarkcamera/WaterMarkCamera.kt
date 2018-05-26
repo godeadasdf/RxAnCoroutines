@@ -29,7 +29,7 @@ class WaterMarkCamera : FrameLayout {
         photoRecycler.apply {
             layoutManager = GridLayoutManager(context, 3)
             adapter = WaterMarkAdapter(R.layout.marker_image_item)
-            
+
         }
     }
 
